@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <string name="app_name">Loyal3</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_logout">Log Out</string>
+    <string name="title_activity_scan">Loyal 3</string>
+    <string name="title_activity_display"></string>
+    <string name="title_activity_settings">My Settings</string>
+    <string name="title_activity_my3wards">My 3wards</string>
+    <string name="title_activity_claim">ClaimActivity</string>
+    <string name="title_activity_register">RegisterActivity</string>
+    <string name="title_activity_profile">My Profile</string>
+
+    <style name="DefaultButtonText">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_margin">3dp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">20sp</item>
+        <item name ="android:padding">7dp</item>
+        <item name ="android:textColor">#800000</item>
+        <item name ="android:shadowColor">@android:color/darker_gray</item>
+        <item name ="android:shadowDx">3</item>
+        <item name ="android:shadowDy">3</item>
+        <item name ="android:shadowRadius">3</item>
+    </style>
+
+    <string name="title_activity_retrieve">RetrieveActivity</string>
+
+</resources>
