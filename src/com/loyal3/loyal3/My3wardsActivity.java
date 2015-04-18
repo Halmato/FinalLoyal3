@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
@@ -62,8 +63,8 @@ public class My3wardsActivity extends ActionBarActivity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			Intent intent = new Intent(My3wardsActivity.this, SettingsActivity.class);
+		if (id == R.id.action_contact) {
+			Intent intent = new Intent(My3wardsActivity.this, ContactUsActivity.class);
 			startActivity(intent);
 			return true;
 			
@@ -93,8 +94,10 @@ public class My3wardsActivity extends ActionBarActivity {
 
 		String[] asdf = listOfShopsString.split(",");
 
-		if(asdf[0].equals("") && asdf.length == 1)	{
+		if( asdf.length ==0 || (asdf[0].equals("") && asdf.length == 1))	{
 			String[] empty = new String[0];
+			Toast.makeText(getBaseContext(), "No Shops Available", Toast.LENGTH_LONG).show();
+
 			return empty;
 		} else {
 			return asdf;
@@ -128,7 +131,13 @@ public class My3wardsActivity extends ActionBarActivity {
 		catch (Exception e) 
 		{
 			Toast.makeText(getBaseContext(), "Image could not be loaded", Toast.LENGTH_LONG).show();
-			return null;
+			
+			
+			int lId = getResources().getIdentifier("shoplogo_no_image", "drawable", "com.loyal3.loyal3");
+			
+			Bitmap noImage = BitmapFactory.decodeResource(getResources(), lId);
+			
+			return noImage;
 		}
 
 	}		
@@ -164,7 +173,6 @@ public class My3wardsActivity extends ActionBarActivity {
 		
 		String[] shops = getListOfShopsArray();
 		
-
 		// Sets scrollView dynamically with ImageButtons, textViews and Buttons(claim).		
 		LinearLayout llMain = (LinearLayout) findViewById(R.id.llMain);
 		ScrollView sv = new ScrollView(this);
@@ -173,7 +181,6 @@ public class My3wardsActivity extends ActionBarActivity {
 		
 		TableLayout tl = new TableLayout(this);
 		sv.addView(tl);
-		Toast.makeText(getBaseContext(), "CP#4\n"+shops.length, Toast.LENGTH_LONG).show();
 
 		for(int i = 0; i < shops.length; i++)	{	
 			
@@ -187,6 +194,12 @@ public class My3wardsActivity extends ActionBarActivity {
 			String shopname = shops[i].trim();
 			String scancount = getSharedPrefs(shopname, "scanCount", "0");
 			String maxscans = getSharedPrefs(shopname, "maxScans", "10");
+
+			
+/*			if(Integer.parseInt(scancount) == 0 || Integer.parseInt(scancount) >= Integer.parseInt(maxscans)) {
+				scancount = getSharedPrefs(shopname, "localScanCount", "0");
+			}
+			*/
 			
 			String lastredeem = getSharedPrefs(shopname, "lastRedeem", "No Redeems");
 			
@@ -217,29 +230,77 @@ public class My3wardsActivity extends ActionBarActivity {
 					finish();
 					}
 				});	//End of onClickListener
+			
+			
 						
 			LinearLayout llInTR = new LinearLayout(this);
 			
 			llInTR.setOrientation(LinearLayout.VERTICAL);
 			llInTR.setLayoutParams(lp1);
 			
-			TextView tvScanCount = new TextView(this);
-			TextView tvLastRedeem = new TextView(this);
+		//	TextView tvScanCount = new TextView(this);
+		//	TextView tvLastRedeem = new TextView(this);
 			
-			tvScanCount.setLayoutParams(lp2);
-			tvLastRedeem.setLayoutParams(lp3);
+			Button btnScanCount = new Button(this);
+			Button btnLastRedeem = new Button(this);
+			
+			
+			btnScanCount.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View arg0) {
+					
+					Intent intent = new Intent(My3wardsActivity.this, DisplayActivity.class);
+					intent.putExtra("shopName", shopNameInstance);
+					startActivity(intent);
+					finish();
+					}
+				});	//End of onClickListener
+			
+			btnLastRedeem.setOnClickListener(new View.OnClickListener() {
+				public void onClick(View arg0) {
+					
+					Intent intent = new Intent(My3wardsActivity.this, DisplayActivity.class);
+					intent.putExtra("shopName", shopNameInstance);
+					startActivity(intent);
+					finish();
+					}
+				});	//End of onClickListener
+			
+			btnScanCount.setLayoutParams(lp2);
+			btnLastRedeem.setLayoutParams(lp3);
+			
+			btnLastRedeem.setPadding(0, 0, 0, 0);
+			btnScanCount.setPadding(0, 0, 0, 0);
 
-			tvScanCount.setText("SCANS  "+scancount+" / "+maxscans);
-			tvScanCount.setGravity(Gravity.CENTER);
 			
-			tvLastRedeem.setText("Last Redeem: "+lastredeem);
-			tvLastRedeem.setGravity(Gravity.CENTER);
+	//		tvScanCount.setLayoutParams(lp2);
+	//		tvLastRedeem.setLayoutParams(lp3);
+
+			
+			btnScanCount.setText("SCANS  "+scancount+" / "+maxscans);
+			btnScanCount.setGravity(Gravity.CENTER);
+			
+	//		tvScanCount.setText("SCANS  "+scancount+" / "+maxscans);
+	//		tvScanCount.setGravity(Gravity.CENTER);
+			
+			
+			btnLastRedeem.setText("Last Redeem:\n"+lastredeem);
+			btnLastRedeem.setGravity(Gravity.CENTER);
+			
+			btnLastRedeem.setBackgroundColor(Color.TRANSPARENT);
+			btnScanCount.setBackgroundColor(Color.TRANSPARENT);
+			
+	//		tvLastRedeem.setText("Last Redeem: "+lastredeem);
+	//		tvLastRedeem.setGravity(Gravity.CENTER);
 			
 			tr.addView(ib);
 			tr.addView(llInTR);
 			
-			llInTR.addView(tvScanCount);
-			llInTR.addView(tvLastRedeem);
+
+			llInTR.addView(btnScanCount);
+			llInTR.addView(btnLastRedeem);
+							
+		//	llInTR.addView(tvScanCount);
+		//	llInTR.addView(tvLastRedeem);
 							
 		}	
 

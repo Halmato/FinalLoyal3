@@ -23,7 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ibScan"	
-        android:src="@drawable/capture_button_200"
+        android:src="@drawable/background_filter"
         android:background="@android:color/transparent"	/>
 
     

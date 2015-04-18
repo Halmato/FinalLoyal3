@@ -43,13 +43,11 @@
 	                android:id="@+id/etName"
 	                android:layout_height="match_parent"
 	                android:layout_width="match_parent"
-	                android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
 	                android:inputType="textPersonName"
 	                android:hint="Your Name"	
 	                android:background="@android:color/transparent"
 	                android:layout_gravity="center_vertical"
-	                android:paddingLeft="10dp"
-	                />
+	                android:paddingLeft="10dp"/>
 	        </LinearLayout>
 	        
 	        <View 
@@ -59,6 +57,7 @@
 	            android:background="#800000"/>
 	        
 	        <LinearLayout 
+	            android:id="@+id/llCake"
 	            android:layout_height="wrap_content"
 	            android:layout_width="match_parent"
 	            android:orientation="horizontal"
@@ -77,7 +76,7 @@
 	                android:layout_gravity="fill_vertical"
 	                android:background="@android:color/transparent"
 	                android:gravity="center_vertical"
-	                android:textSize="20dp"
+	                android:textSize="18dp"
 	                android:paddingLeft="10dp"
 	                android:textColor="#800000"
 	                
@@ -89,7 +88,9 @@
 	                android:layout_width="wrap_content"
 	                android:text="Pick Date"
 	                android:background="@drawable/button_default_bg"
-               		style="@style/DefaultButtonText"/>
+               		style="@style/DefaultButtonText"
+               		android:gravity="right"
+               		/>
 	        </LinearLayout>
 	        <View 
 	            android:layout_marginTop="5dp"
@@ -140,37 +141,43 @@
 	         
 	            </RadioGroup>
 	        </LinearLayout>
-	<!--         
+	        
+	        <View 
+	            android:layout_marginTop="5dp"
+	            android:layout_width="match_parent"
+	            android:layout_height="2px"
+	            android:background="#800000"/>
+	        
 	        <LinearLayout 
 	            android:layout_height="wrap_content"
 	            android:layout_width="match_parent"
 	            android:orientation="horizontal"
 	            android:layout_marginTop="30dp">
-	            <TextView 
-		            android:layout_height="60dp"
-		            android:layout_width="wrap_content"
-		            android:text="Day of Birth: \n(Optional)"/>
+	            
+	            <ImageView 
+	                android:id="@+id/ivEmailProfile"
+	                android:layout_height="1dp"
+	                android:layout_width="1dp"
+	                android:src="@drawable/sign_up_username"/>
+	            
 	            <EditText 
-	                android:id="@+id/etAgeDay"
-	                android:layout_height="wrap_content"
-	                android:layout_width="fill_parent"
-	                android:inputType="number"/>
+	                android:id="@+id/etEmailProfile"
+	                android:layout_height="match_parent"
+	                android:layout_width="match_parent"
+	                android:inputType="textEmailAddress"
+	                android:hint="Email Address (Optional)"	
+	                android:background="@android:color/transparent"
+	                android:layout_gravity="center_vertical"
+	                android:paddingLeft="10dp"/>
 	        </LinearLayout>
-	        <LinearLayout 
-	            android:layout_height="wrap_content"
+	        <View 
+	            android:layout_marginTop="5dp"
 	            android:layout_width="match_parent"
-	            android:orientation="horizontal"
-	            android:layout_marginTop="30dp">
-	            <TextView 
-		            android:layout_height="60dp"
-		            android:layout_width="wrap_content"
-		            android:text="Month of Birth: \n(Optional)"/>
-	            <EditText 
-	                android:id="@+id/etAgeMonth"
-	                android:layout_height="wrap_content"
-	                android:layout_width="fill_parent"
-	                android:inputType="number"/>
-	        </LinearLayout>	--> 
+	            android:layout_height="2px"
+	            android:background="#800000"/>
+	        
+	        
+	
 	        
 	        <Button 
 	            android:id="@+id/btn_submit"
@@ -183,6 +190,161 @@
 	            android:background="@drawable/button_default_bg"
                	style="@style/DefaultButtonText"/>
 	    </LinearLayout>
+	    
+	    
+	    
+	    
+	    <Button 
+	        android:id="@+id/btnChangePasswordToggle"
+	        android:padding="5dp"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_height="wrap_content"
+	        android:layout_width="wrap_content"
+	        android:text="Change Password"
+	        style="@style/DefaultButtonText"
+	        android:background="@drawable/button_default_bg"
+	        android:layout_marginTop="30dp"
+	        />
+	    
+	    <LinearLayout 
+	        android:id="@+id/llChangePassword"
+	        android:orientation="vertical"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:visibility="gone"
+	        android:layout_marginTop="20dp"
+	        android:layout_marginLeft="20dp"
+	        android:layout_marginRight="20dp">
+	        
+	        
+	        <LinearLayout 
+	            android:orientation="horizontal"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content">
+	            
+	             <ImageView 
+                    android:id="@+id/ivOldPassword"
+                    android:layout_height="1dp"
+                    android:layout_width="1dp"
+                    android:src="@drawable/signup_password_icon"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginLeft="3dp"/>
+                
+                <EditText 
+				     android:id="@+id/etOldPassword"
+				     android:layout_width="match_parent"
+               		 android:layout_height="wrap_content"
+            		 android:padding="10dp"
+            		 android:hint="Old Password"
+            		 android:textColorHint="#aaaaaa"
+            		 android:background="@android:color/transparent"
+            		 android:inputType="textPassword" />
+	        </LinearLayout>
+	        
+	        
+	        <View 
+	            android:layout_marginTop="5dp"
+	            android:layout_width="match_parent"
+	            android:layout_height="2px"
+	            android:background="#800000"/>
+	        
+	        
+	        <LinearLayout 
+	            android:orientation="horizontal"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content">
+	             <ImageView 
+                    android:id="@+id/ivNewPassword"
+                    android:layout_height="1dp"
+                    android:layout_width="1dp"
+                    android:src="@drawable/signup_password_icon"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginLeft="3dp"/>
+                
+                <EditText 
+				     android:id="@+id/etNewPassword"
+				     android:layout_width="match_parent"
+               		 android:layout_height="wrap_content"
+            		 android:padding="10dp"
+            		 android:hint="New Password"
+            		 android:textColorHint="#aaaaaa"
+            		 android:background="@android:color/transparent"
+            		 android:inputType="textPassword" />
+	        </LinearLayout>
+	        
+	        
+	        <View 
+	            android:layout_marginTop="5dp"
+	            android:layout_width="match_parent"
+	            android:layout_height="2px"
+	            android:background="#800000"/>
+	        
+	        
+	        <LinearLayout 
+	            android:orientation="horizontal"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content">
+	           <ImageView 
+                    android:id="@+id/ivNewPassword2"
+                    android:layout_height="1dp"
+                    android:layout_width="1dp"
+                    android:src="@drawable/signup_password_icon"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginLeft="3dp"/>
+                
+                <EditText 
+				     android:id="@+id/etNewPassword2"
+				     android:layout_width="match_parent"
+               		 android:layout_height="wrap_content"
+            		 android:padding="10dp"
+            		 android:hint="Re-type New Password"
+            		 android:textColorHint="#aaaaaa"
+            		 android:background="@android:color/transparent"
+            		 android:inputType="textPassword" />
+	        </LinearLayout>
+	        
+	        
+	        <View 
+	            android:layout_marginTop="5dp"
+	            android:layout_width="match_parent"
+	            android:layout_height="2px"
+	            android:background="#800000"/>
+	        
+	        
+	        
+	        <Button 
+			        android:id="@+id/btnEmailRecoveryProfile"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:background="@android:color/transparent"
+			        android:text="@string/btnRecoverDetails"
+			        android:textSize="22px"/>
+	        
+	        
+	        
+	        
+	        <Button 
+	            android:id="@+id/btnChangePassword"
+	        	android:padding="5dp"
+	        	android:layout_gravity="center_horizontal"
+	        	android:layout_height="wrap_content"
+	        	android:layout_width="wrap_content"
+	        	android:text="Submit"
+	        	style="@style/DefaultButtonText"
+	        	android:background="@drawable/button_default_bg"
+	        />
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	        
+	    </LinearLayout>
+	    
 	
 	</LinearLayout>
 </ScrollView>

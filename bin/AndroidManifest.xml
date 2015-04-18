@@ -17,7 +17,6 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        
         android:theme="@style/AppTheme" >
         <activity
             android:name=".MainActivity"
@@ -44,7 +43,7 @@
                 android:value="com.loyal3.loyal3.ScanActivity" />
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ContactUsActivity"
             android:label="@string/title_activity_settings"
             android:screenOrientation="portrait" >
             <meta-data
@@ -82,9 +81,13 @@
                 android:value="com.loyal3.loyal3.ScanActivity" />
         </activity>
         <activity
-            android:name=".RetrieveActivity"
-            android:label="@string/title_activity_retrieve"
+            android:name=".DetailsActivity"
+            android:label=""
             android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".BlockedActivity"
+            android:label="@string/title_activity_blocked" >
         </activity>
     </application>
 

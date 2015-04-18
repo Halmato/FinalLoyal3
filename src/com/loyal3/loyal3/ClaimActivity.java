@@ -6,6 +6,8 @@ import java.util.Calendar;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.ActionBar;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +15,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -23,8 +26,9 @@ import android.widget.Toast;
 public class ClaimActivity extends ActionBarActivity {
 
 	private int seconds = 300;	//5 minutes
-	private int idBlack, idGray, counter;
-	private int height, width;
+	private int interval = 1;	//seconds between flashing
+	private int idBlack, idBlack2, idBlack3, counter;
+	private int width;
 	private String shopName;
 	
 	@Override
@@ -41,7 +45,6 @@ public class ClaimActivity extends ActionBarActivity {
 		
 		DisplayMetrics displaymetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-		height = displaymetrics.heightPixels;
 		width = displaymetrics.widthPixels;
 		
 		Bundle extras = getIntent().getExtras();
@@ -58,27 +61,48 @@ public class ClaimActivity extends ActionBarActivity {
 		
 		setLogo(getLogoID(shopName), ivShopLogo);	
 		
-		idBlack = getResources().getIdentifier("background_qr_xxhdpi", "drawable", "com.loyal3.loyal3");
-		idGray = getResources().getIdentifier("background_qr_xxhdpi_gray", "drawable", "com.loyal3.loyal3");
+		idBlack = getResources().getIdentifier("background_qr_xxhdpi_black_2", "drawable", "com.loyal3.loyal3");
+		idBlack2 = getResources().getIdentifier("background_qr_xxhdpi_black2_2", "drawable", "com.loyal3.loyal3");
+		idBlack3 = getResources().getIdentifier("background_qr_xxhdpi_black3_2", "drawable", "com.loyal3.loyal3");
+
 		
 		new CountDownTimer((seconds * 1000), 1000) {
 			public void onTick(long millisUntilFinished) {
 	
 				RelativeLayout rlMain = (RelativeLayout) findViewById(R.id.rlMain);	
-				if((millisUntilFinished/1000) % 3 == 0)	{
+				if((millisUntilFinished/1000) % interval == 0)	{
 				
-					if(counter%2 == 0){
+					if(counter%4 == 0){
 						rlMain.setBackgroundResource(idBlack);
+					} else if(counter%4 == 1){
+						rlMain.setBackgroundResource(idBlack2);
+					} else if(counter%4 == 2){
+						rlMain.setBackgroundResource(idBlack3);
 					} else {
-						rlMain.setBackgroundResource(idGray);
+						rlMain.setBackgroundResource(idBlack2);
+
 					}
 					
 					counter++;
 				}	
 				
+				String minutesCorrectFormat = "";
+				String secondsCorrectFormat = "";
+				
+				if(millisUntilFinished/60000 < 10) {
+					minutesCorrectFormat = "0"+(millisUntilFinished/60000);
+				} else {
+					minutesCorrectFormat = "" + millisUntilFinished/60000;
+				}
+				
+				if((millisUntilFinished/1000)%60 < 10) {
+					secondsCorrectFormat = "0"+((millisUntilFinished/1000)%60);
+				} else {
+					secondsCorrectFormat = "" + (millisUntilFinished/1000)%60;
+				}
 				
 				TextView tvTest = (TextView)findViewById(R.id.tvTimer);
-				tvTest.setText("Time remaining: " + (millisUntilFinished / 1000)/60+":"+(millisUntilFinished/1000)%60);}
+				tvTest.setText("Time remaining: " + minutesCorrectFormat +":"+secondsCorrectFormat);}
 
 			     public void onFinish() {
 			    	 finish();
@@ -227,6 +251,47 @@ public class ClaimActivity extends ActionBarActivity {
 
 		return day+"/"+month+"/"+year + "  "+hours+":"+minutes+":"+seconds;	
 	}	
+	
+	
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if (keyCode == KeyEvent.KEYCODE_BACK) {
+	        exitByBackKey();
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+
+	protected void exitByBackKey() {
+
+	    AlertDialog alertbox = new AlertDialog.Builder(this)
+	    .setMessage("You will not be able to return to this screen if you proceed. Are you sure you want to close the screen?")
+	    .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+	        // do something when the button is clicked
+	        public void onClick(DialogInterface arg0, int arg1) {
+
+	            finish();
+	            //close();
+
+
+	        }
+	    })
+	    .setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+	        // do something when the button is clicked
+	        public void onClick(DialogInterface arg0, int arg1) {
+	                       }
+	    })
+	      .show();
+
+	}
+	
+	
+	
+	
+	
+	
+	
 	
 	
 }

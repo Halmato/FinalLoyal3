@@ -150,7 +150,40 @@
 			    android:background="#d3d3d3"
 			    android:layout_marginBottom="5dp"/>   
 
+			<LinearLayout
+                android:orientation="horizontal"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent" >
+
+                <ImageView 
+                    android:id="@+id/ivEmail"
+                    android:layout_height="1dp"
+                    android:layout_width="1dp"
+                    android:src="@drawable/signup_password_icon"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginLeft="3dp"/>
+                
+                <EditText 
+				     android:id="@+id/etRecoveryEmail"
+				     android:layout_width="match_parent"
+               		 android:layout_height="wrap_content"
+            		 android:padding="10dp"
+            		 android:hint="Email (Optional)"
+            		 android:textColorHint="#aaaaaa"
+            		 android:background="@android:color/transparent"
+            		 android:inputType="textEmailAddress"/>
+			
+                
+            </LinearLayout> 
+				
+			<View 
+			    android:layout_height="3px"
+			    android:layout_width="match_parent"
+			    android:background="#d3d3d3"
+			    android:layout_marginBottom="5dp"/>   
 				    
+			
+			
 				 <Button 
 				        android:id="@+id/btnRegister"
 				        android:layout_height="wrap_content"
@@ -259,6 +292,14 @@
 				    android:layout_gravity="center_horizontal"
 				    android:padding="5dp"
 			        android:text="Sign In"/>
+			    
+			    <Button 
+			        android:id="@+id/btnEmailRecoveryRegister"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:background="@android:color/transparent"
+			        android:text="@string/btnRecoverDetails"
+			        android:textSize="22px"/>
 			    
 			    
 		</LinearLayout>

@@ -3,10 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.loyal3.loyal3.My3wardsActivity" >
 
+    
+    
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:id="@+id/action_profile"
+        android:orderInCategory="90"
+        android:title="My Profile"
         app:showAsAction="never"/>
-
+    
+    <item
+        android:id="@+id/action_contact"
+        android:orderInCategory="100"
+        android:title="@string/action_contact"
+        app:showAsAction="never"/>
 </menu>

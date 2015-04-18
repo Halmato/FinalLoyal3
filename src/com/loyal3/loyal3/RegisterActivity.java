@@ -19,9 +19,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONObject;
 import android.support.v7.app.ActionBarActivity;
+import android.text.InputType;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -50,10 +53,11 @@ public class RegisterActivity extends ActionBarActivity {
 	
 	private int imageCounter;
 	private String[] arrayOfImageIDsToDownload;
-	private String username,password,uuid;
+	private String username,password,uuid,email;
+	private String emailRecover;
 	private ProgressDialog pDialog;
 	private LinearLayout llSignUp,llHaveAccount;
-	private EditText etUsername,etPassword1,etPassword2,etUsernameSignIn,etPasswordSignIn;
+	private EditText etUsername,etPassword1,etPassword2,etUsernameSignIn,etPasswordSignIn,etRecoveryEmail;
 	private int buttonCounterSignUp, buttonCounterSignIn;
 	private int height,width;
 
@@ -77,6 +81,8 @@ public class RegisterActivity extends ActionBarActivity {
 		etUsername = (EditText) findViewById(R.id.username);
 		etPassword1 = (EditText) findViewById(R.id.password1);
 		etPassword2 = (EditText) findViewById(R.id.password2);
+		etRecoveryEmail = (EditText) findViewById(R.id.etRecoveryEmail);
+		
 		etUsernameSignIn = (EditText) findViewById(R.id.etUsernameSignIn);
 		etPasswordSignIn = (EditText) findViewById(R.id.etPasswordSignIn);
 		/*######################################################################################
@@ -179,6 +185,48 @@ public class RegisterActivity extends ActionBarActivity {
 				}
 			}
 		});	
+		
+		
+		Button btnEmailRecoverRegister = (Button) findViewById(R.id.btnEmailRecoveryRegister);
+		btnEmailRecoverRegister.setOnClickListener(new View.OnClickListener() {
+			
+			public void onClick(View arg0) {
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(RegisterActivity.this);
+				builder.setTitle("Account Details Recovery");
+				
+				final EditText input = new EditText(RegisterActivity.this);
+				// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+				input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+				input.setHint("Enter your Email");
+				builder.setView(input);
+				
+				builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+				    public void onClick(DialogInterface dialog, int which) {
+				    
+				    	
+				    	emailRecover = input.getText().toString();
+				    	String urlRecover = "http://www.loyal3.co.za/recover?email="+emailRecover;
+				    	
+				    	new RecoverAsyncTask().execute(urlRecover);
+				    
+				    }
+				});
+				builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				    public void onClick(DialogInterface dialog, int which) {
+				        dialog.cancel();
+				    }
+				});
+
+				builder.show();
+				
+				
+				
+			}
+		});
+		
+		
+		
 	}	//END OF onCreate
 
 	/*######################################################################################################
@@ -198,6 +246,7 @@ public class RegisterActivity extends ActionBarActivity {
 
 		String mUsername = etUsername.getText().toString();
 		String mPassword = etPassword1.getText().toString();
+		String mRecoveryEmail = etRecoveryEmail.getText().toString();
 
 		if(mUsername.isEmpty()||mPassword.isEmpty())	{
 			Toast.makeText(getBaseContext(),"Please fill in all the fields",Toast.LENGTH_LONG).show();
@@ -214,6 +263,8 @@ public class RegisterActivity extends ActionBarActivity {
 		}else{
 			username = mUsername;
 			password = mPassword;
+			email = mRecoveryEmail;
+			
 			return true;
 		}
 	}
@@ -235,7 +286,7 @@ public class RegisterActivity extends ActionBarActivity {
 		protected String doInBackground(String... arg0) {
 
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost("http://wilcostr.pythonanywhere.com/signIn");
+			HttpPost post = new HttpPost("http://www.loyal3.co.za/signIn");
 			String result="";
 
 			try {
@@ -290,7 +341,7 @@ public class RegisterActivity extends ActionBarActivity {
 
 					if(shopsListArrayLength > 0 && (!shopsListArray[0].equals("")) )	{
 
-						String urlRefresh = "http://wilcostr.pythonanywhere.com/refresh?uuid="+uuid+"&shop="+shopsListArray[counter1].trim();
+						String urlRefresh = "http://www.loyal3.co.za/refresh?uuid="+uuid+"&shop="+shopsListArray[counter1].trim();
 
 						new HttpAsyncTaskRefresh().execute(urlRefresh);
 
@@ -343,12 +394,12 @@ public class RegisterActivity extends ActionBarActivity {
 
 					if(counter1 < shopsListArrayLength)	{
 
-						String urlRefreshAgain = "http://wilcostr.pythonanywhere.com/refresh?uuid="+uuid+"&shop="+shopsListArray[counter1].trim();
+						String urlRefreshAgain = "http://www.loyal3.co.za/refresh?uuid="+uuid+"&shop="+shopsListArray[counter1].trim();
 						new HttpAsyncTaskRefresh().execute(urlRefreshAgain);		//Calls himself if there are still stuff left
 
 					} else {
 
-						String urlRefreshAgain = "http://wilcostr.pythonanywhere.com/refresh?uuid="+uuid+"&shop=advertshop";
+						String urlRefreshAgain = "http://www.loyal3.co.za/refresh?uuid="+uuid+"&shop=advertshop";
 						new HttpAsyncTaskRefresh().execute(urlRefreshAgain);		//Calls the 1st image of Advertshop. 
 					}
 
@@ -368,7 +419,7 @@ public class RegisterActivity extends ActionBarActivity {
 						String[] imagesOfShopsArray = createArrayFromString(imagesOfShopString);
 						String imageLogoOfShop = imagesOfShopsArray[0].trim();
 
-						String urlImage = "http://wilcostr.pythonanywhere.com/downloadImage?shop="+shopsListArray[counter2].trim()+"&image="+imageLogoOfShop+"&res="+screenSize;
+						String urlImage = "http://www.loyal3.co.za/downloadImage?shop="+shopsListArray[counter2].trim()+"&image="+imageLogoOfShop+"&res="+screenSize;
 
 						new HttpAsyncTaskDownloadImage().execute(urlImage);
 
@@ -410,7 +461,7 @@ public class RegisterActivity extends ActionBarActivity {
 					imagesOfShopsArray = createArrayFromString(imagesOfShopString);
 					imageLogoOfShop = imagesOfShopsArray[0].trim();
 
-					String urlImage = "http://wilcostr.pythonanywhere.com/downloadImage?shop="+shopsListArray[counter2].trim()+"&image="+imageLogoOfShop+"&res="+screenSize();
+					String urlImage = "http://www.loyal3.co.za/downloadImage?shop="+shopsListArray[counter2].trim()+"&image="+imageLogoOfShop+"&res="+screenSize();
 
 					new HttpAsyncTaskDownloadImage().execute(urlImage);
 				} else {
@@ -479,7 +530,7 @@ public class RegisterActivity extends ActionBarActivity {
 		String[] advertImagesArray = createArrayFromString(advertImagesString);
 		String firstAdvertID = advertImagesArray[counter3].trim();
 
-		String urlAdvertImageToDownload = "http://wilcostr.pythonanywhere.com/downloadImage?shop=advertshop&image="+firstAdvertID+"&res="+screenSize();
+		String urlAdvertImageToDownload = "http://www.loyal3.co.za/downloadImage?shop=advertshop&image="+firstAdvertID+"&res="+screenSize();
 
 		new HttpAsyncTaskDownloadAdverts().execute(urlAdvertImageToDownload);
 	}*/
@@ -505,7 +556,7 @@ public class RegisterActivity extends ActionBarActivity {
 			if(counter3 < amountOfAdverts)	{
 
 				String imageID2 = advertImagesArray[counter3].trim();
-				String urlAdvertImageToDownload = "http://wilcostr.pythonanywhere.com/downloadImage?shop=advertshop&image="+imageID2+"&res="+screenSize();
+				String urlAdvertImageToDownload = "http://www.loyal3.co.za/downloadImage?shop=advertshop&image="+imageID2+"&res="+screenSize();
 				new HttpAsyncTaskDownloadAdverts().execute(urlAdvertImageToDownload);
 
 			} else {
@@ -663,7 +714,7 @@ public class RegisterActivity extends ActionBarActivity {
 		protected String doInBackground(String... arg0) {
 
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost("http://wilcostr.pythonanywhere.com/signIn");
+			HttpPost post = new HttpPost("http://www.loyal3.co.za/signIn");
 
 			String result="";
 
@@ -710,23 +761,29 @@ public class RegisterActivity extends ActionBarActivity {
 				startActivity(intent);
 
 			} else {
-
+				
 				try{
-					String formattedResult = result + ",";
+					String formattedResult = result.trim();
+					
+					if(!formattedResult.endsWith(","))	{
+						formattedResult = formattedResult+",";
+					}
+					
 					setSharedPrefs("userDetails", "listOfShops", formattedResult.trim());
 
-					if(! (getListOfShopsArray(formattedResult).length == 1 && getListOfShopsArray(formattedResult)[0].equals("")) && getListOfShopsArray(formattedResult).length != 0)	{
+					if( getListOfShopsArray(formattedResult).length != 0  && (!(getListOfShopsArray(formattedResult).length == 1 && getListOfShopsArray(formattedResult)[0].equals(""))))	{
 
-						String url = "http://wilcostr.pythonanywhere.com/refresh?shop=advertshop&uuid="+uuid;
-						
+						String url = "http://www.loyal3.co.za/refresh?shop=advertshop&uuid="+uuid;
+
 						new RefreshAllShopInfo().execute(url);
 
 					} else {
+						
 						Toast.makeText(getBaseContext(), "No Shops Available", Toast.LENGTH_LONG).show();
 						
 						imageCounter = 0;
 						
-						String url = "http://wilcostr.pythonanywhere.com/refresh?uuid="+uuid+"&shop=advertshop";
+						String url = "http://www.loyal3.co.za/refresh?uuid="+uuid+"&shop=advertshop";
 						
 						new RefreshAllShopInfo_signUp().execute(url);
 						
@@ -735,13 +792,10 @@ public class RegisterActivity extends ActionBarActivity {
 
 				}catch(Exception e)	{
 					//Restarts the app. 
-					Toast.makeText(getBaseContext(), "Error #22.  Please try again.", Toast.LENGTH_LONG).show();}
-					/*Intent intent = getIntent();
-					finish();
-					startActivity(intent);*/
-					/*pDialog.dismiss();
-
-				}*/
+					Toast.makeText(getBaseContext(), "Error #22.  Please try again.", Toast.LENGTH_LONG).show();
+					recreate();
+					pDialog.dismiss();
+					}
 			}	
 		}	//End of onPostExecute
 	}
@@ -763,19 +817,32 @@ public class RegisterActivity extends ActionBarActivity {
 		protected String doInBackground(String... arg0) {
 
 			HttpClient client = new DefaultHttpClient();
-			HttpPost post = new HttpPost("http://wilcostr.pythonanywhere.com/addUser");
+			HttpPost post = new HttpPost("http://www.loyal3.co.za/addUser");
 			String result="";
 
 			try {
 
 				String passwordEncoded = URLEncoder.encode(password, "UTF-8");
 				String usernameEncoded = URLEncoder.encode(username, "UTF-8");
+				String emailEncoded;
+				
+				try{
+					emailEncoded = URLEncoder.encode(email, "UTF-8");
+				} catch(Exception d) {
+					
+					emailEncoded = "None";
+					//Sit dialog in of die user dit wil fix/insit. 
+				}
 				
 				
 				List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
 				nameValuePairs.add(new BasicNameValuePair("uuid", uuid));
 				nameValuePairs.add(new BasicNameValuePair("username", usernameEncoded));
 				nameValuePairs.add(new BasicNameValuePair("password", passwordEncoded));
+				nameValuePairs.add(new BasicNameValuePair("email", emailEncoded));
+
+				
+				
 				post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 				HttpResponse response = client.execute(post);
@@ -796,12 +863,14 @@ public class RegisterActivity extends ActionBarActivity {
 		}
 
 		protected void onPostExecute(String result) {
-
+			
 			if(result.equals("*success*"))	{
+				
+				setSharedPrefs("userDetails", "recoveryEmail", email);
 				
 				imageCounter = 0;
 				
-				String url = "http://wilcostr.pythonanywhere.com/refresh?uuid="+uuid+"&shop=advertshop";
+				String url = "http://www.loyal3.co.za/refresh?uuid="+uuid+"&shop=advertshop";
 				
 				new RefreshAllShopInfo_signUp().execute(url);
 
@@ -811,6 +880,13 @@ public class RegisterActivity extends ActionBarActivity {
 				EditText et = (EditText)findViewById(R.id.username);
 				et.requestFocus();
 				et.setText("");
+				
+			} else if (result.equals("*duplicate email*")) {
+				Toast.makeText(getBaseContext(), "That email address is already in use. Please provide a new email address", Toast.LENGTH_LONG).show();
+				pDialog.dismiss();
+				EditText etRecoverEmail = (EditText)findViewById(R.id.etRecoveryEmail);
+				etRecoverEmail.requestFocus();
+				etRecoverEmail.setText("");
 				
 			} else {
 				Toast.makeText(getBaseContext(), "Error #101\nPlease Try Again."+result, Toast.LENGTH_LONG).show();
@@ -849,12 +925,12 @@ public class RegisterActivity extends ActionBarActivity {
 					shopName = getListOfShopsArray()[imageCounter].trim();
 				}
 				
-					
 				String scanCount = json.getString("scanCount");								
 				String maxScans = json.getString("maxScans");	
 				String imageIDsString = json.getString("imageIDs").trim();
 
 				setSharedPrefs(shopName, "scanCount", scanCount);
+				setSharedPrefs(shopName, "localScanCount", scanCount);
 				setSharedPrefs(shopName, "maxScans", maxScans);
 				setSharedPrefs(shopName, "imageIDs", imageIDsString);
 
@@ -866,7 +942,7 @@ public class RegisterActivity extends ActionBarActivity {
 					pDialog.setMessage("Calibrating articulate splines");
 					pDialog.show();
 
-					String url = "http://wilcostr.pythonanywhere.com/refresh?shop="+getListOfShopsArray()[imageCounter].trim()+"&uuid="+uuid;
+					String url = "http://www.loyal3.co.za/refresh?shop="+getListOfShopsArray()[imageCounter].trim()+"&uuid="+uuid;
 
 					new RefreshAllShopInfo().execute(url);
 
@@ -875,9 +951,7 @@ public class RegisterActivity extends ActionBarActivity {
 					imageCounter = 0;
 					arrayOfImageIDsToDownload = getArrayOfMissingImages(getLogoIDs(getListOfShopsArray()));
 					
-					String url = "http://wilcostr.pythonanywhere.com/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
-
-					Toast.makeText(getBaseContext(), "TEST:"+url, Toast.LENGTH_LONG).show();
+					String url = "http://www.loyal3.co.za/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
 
 					new DownloadLogos_refresh().execute(url);
 				}
@@ -885,7 +959,6 @@ public class RegisterActivity extends ActionBarActivity {
 			}catch(Exception e)	{
 				Toast.makeText(getBaseContext(), "Catch #21:05.", Toast.LENGTH_LONG).show();
 			}	
-			pDialog.dismiss();
 		}	
 	}
 
@@ -912,8 +985,10 @@ public class RegisterActivity extends ActionBarActivity {
 				
 				imageCounter = 0;
 				arrayOfImageIDsToDownload = getArrayOfMissingImages(getImageIDs(shopName));
+				
+				pDialog.dismiss();
 
-				String url = "http://wilcostr.pythonanywhere.com/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter]+"&res="+screenSize();
+				String url = "http://www.loyal3.co.za/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter]+"&res="+screenSize();
 
 				pDialog = new ProgressDialog(RegisterActivity.this);
 				pDialog.setMessage("Calibrating articulate splines");
@@ -952,7 +1027,7 @@ public class RegisterActivity extends ActionBarActivity {
 				imageCounter = 0;
 				arrayOfImageIDsToDownload = getArrayOfMissingImages(getImageIDs(shopName));
 
-				String url = "http://wilcostr.pythonanywhere.com/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter]+"&res="+screenSize();
+				String url = "http://www.loyal3.co.za/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter]+"&res="+screenSize();
 
 				pDialog = new ProgressDialog(RegisterActivity.this);
 				pDialog.setMessage("Calibrating articulate splines");
@@ -986,7 +1061,7 @@ public class RegisterActivity extends ActionBarActivity {
 				saveBitmapToInternalStorage(bmap, arrayOfImageIDsToDownload[imageCounter].trim());
 
 			} catch(Exception ignore)	{   	
-				Toast.makeText(getBaseContext(), "catch #21:30", Toast.LENGTH_LONG).show();
+				Toast.makeText(getBaseContext(), "catch #21:31", Toast.LENGTH_LONG).show();
 			}
 
 			imageCounter++;
@@ -994,7 +1069,7 @@ public class RegisterActivity extends ActionBarActivity {
 			
 			if(imageCounter < arrayOfImageIDsToDownload.length)	{
 
-				String url = "http://wilcostr.pythonanywhere.com/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
+				String url = "http://www.loyal3.co.za/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
 				new DownloadLogos_refresh().execute(url);
 
 			} else {
@@ -1003,7 +1078,7 @@ public class RegisterActivity extends ActionBarActivity {
 
 				arrayOfImageIDsToDownload = getArrayOfMissingImages(getImageIDs("advertshop"));
 
-				String url = "http://wilcostr.pythonanywhere.com/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
+				String url = "http://www.loyal3.co.za/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
 
 				new DownloadAdverts_refresh().execute(url);
 
@@ -1039,7 +1114,7 @@ public class RegisterActivity extends ActionBarActivity {
 			
 			if(imageCounter < arrayOfImageIDsToDownload.length)	{
 
-				String url = "http://wilcostr.pythonanywhere.com/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
+				String url = "http://www.loyal3.co.za/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
 				
 				new DownloadAdverts_refresh().execute(url);
 
@@ -1085,11 +1160,6 @@ public class RegisterActivity extends ActionBarActivity {
 		String allImageIDsString = "";
 
 		allImageIDsString = getSharedPrefs(shop.trim(),"imageIDs","empty");
-		String test = getSharedPrefs("advertshop", "imageIDs", "EmPtY");
-		Toast.makeText(getBaseContext(), ""+allImageIDsString, Toast.LENGTH_LONG).show();
-		Toast.makeText(getBaseContext(), ""+test, Toast.LENGTH_LONG).show();
-
-
 
 		if(!allImageIDsString.equals("empty"))	{
 			
@@ -1180,7 +1250,7 @@ public class RegisterActivity extends ActionBarActivity {
 		
 		String[] asdf = listOfShops.trim().split(",");
 
-		if(asdf[0].equals("") && asdf.length == 1)	{
+		if(asdf.length == 0 || (asdf[0].equals("") && asdf.length == 1))	{
 			String[] empty = new String[0];
 			return empty;
 		} else {
@@ -1199,11 +1269,8 @@ public class RegisterActivity extends ActionBarActivity {
 
 			String mShopName = shopArray[i].trim();
 			
-			Toast.makeText(getBaseContext(), "TEST: "+mShopName+"|", Toast.LENGTH_LONG).show();
-
 			String imageIDsString = getSharedPrefs(mShopName, "imageIDs", "empty");  
 
-			Toast.makeText(getBaseContext(), "TEST: "+imageIDsString, Toast.LENGTH_LONG).show();
 
 			
 			if(!imageIDsString.equals("empty"))	{
@@ -1221,10 +1288,8 @@ public class RegisterActivity extends ActionBarActivity {
 		
 		if(!logoIDsString.endsWith(","))	{
 			logoIDsString = logoIDsString + ",";
-			Toast.makeText(getBaseContext(), "TEST: added comma at end", Toast.LENGTH_LONG).show();
-
 		}
-		
+				
 		String[] allLogoImageIDs = logoIDsString.split(",");
 
 		if(allLogoImageIDs[0].equals("") && allLogoImageIDs.length == 1)	{
@@ -1336,4 +1401,47 @@ public class RegisterActivity extends ActionBarActivity {
 		return directory.getAbsolutePath();
 	}
 
+	
+	/*##############################################################################################
+	 * 
+     ##############################################################################################*/
+	private class RecoverAsyncTask extends AsyncTask<String, Void, String> {								
+
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog (RegisterActivity.this);
+			pDialog.setMessage("Checking email validity....");
+			pDialog.show();
+
+		}
+
+		protected String doInBackground(String... urls) {
+			return GET(urls[0]);	}							
+
+		protected void onPostExecute(String result) {	
+			
+			try{	
+			
+				if(result.equals("*success*")) {
+					
+					Toast.makeText(getBaseContext(), "An email has been sent to \n"+emailRecover, Toast.LENGTH_LONG).show();
+					
+				} else if(result.equals("*invalid*")) {
+					
+					Toast.makeText(getBaseContext(), "The email is not valid\nFor further assistance, send an email to \nsupport@loyal3.co.za", Toast.LENGTH_LONG).show();
+
+				} else {
+					Toast.makeText(getBaseContext(), "An error has occured, please try again.\nFor further assistance, send an email to \nsupport@loyal3.co.za", Toast.LENGTH_LONG).show();
+
+				}
+
+			}catch(Exception e)	{
+				Toast.makeText(getBaseContext(), "An error has occured, please try again.\nFor further assistance, send an email to \nsupport@loyal3.co.za", Toast.LENGTH_LONG).show();
+			}	
+			pDialog.dismiss();
+		}	
+	}
+	
+	
+	
 }

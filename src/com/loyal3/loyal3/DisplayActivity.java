@@ -29,6 +29,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Base64;
@@ -41,10 +42,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
+import android.widget.ImageView.ScaleType;
 
 public class DisplayActivity extends ActionBarActivity {
 	
@@ -52,10 +55,11 @@ public class DisplayActivity extends ActionBarActivity {
 	private String[] arrayOfImageIDsToDownload;
 	private int imageCounter;
 	private String shopName, maxScans, scanCount;
+	private String title;
 	private float lastX;
 	
 	private ViewFlipper viewFlipper;
-	private ImageView logoView;
+	private ImageButton logoButton;
 	private ProgressDialog pDialog;
 
 	/*################################################################################################
@@ -66,19 +70,32 @@ public class DisplayActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		ActionBar actionBar = getActionBar();
 		actionBar.setBackgroundDrawable(new ColorDrawable(0xFF800000));
+		
+		Bundle extras = getIntent().getExtras();
+		shopName = extras.getString("shopName").trim();
+
+		if(shopName.length() > 0)  {
+			title = shopName.substring(0, 1).toUpperCase() + shopName.substring(1);
+
+		} else {
+			title =shopName;
+		}
+		
+		actionBar.setTitle(title);
 		setContentView(R.layout.activity_display);
 
-		Bundle extras = getIntent().getExtras();
 
-		shopName = extras.getString("shopName").trim();
-		scanCount = getSharedPrefs(shopName, "scanCount", "0");
+		scanCount = getSharedPrefs(shopName, "scanCount", "1");
+		
+		
+		
 		maxScans = getSharedPrefs(shopName, "maxScans", "7");
 
 		DisplayMetrics displaymetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
 		height = displaymetrics.heightPixels;
 		width = displaymetrics.widthPixels;
-		logoView = (ImageView) findViewById(R.id.ivShopLogoDisplay);
+		logoButton = (ImageButton) findViewById(R.id.ibShopLogoDisplay);
 
 		downloadImagesIfMissing();
 
@@ -103,8 +120,8 @@ public class DisplayActivity extends ActionBarActivity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			Intent intent = new Intent(DisplayActivity.this, SettingsActivity.class);
+		if (id == R.id.action_contact) {
+			Intent intent = new Intent(DisplayActivity.this, ContactUsActivity.class);
 			startActivity(intent);
 			return true;
 
@@ -118,7 +135,13 @@ public class DisplayActivity extends ActionBarActivity {
 			Intent intent = new Intent(DisplayActivity.this, ProfileActivity.class);
 			startActivity(intent);
 			return true;
+		}else if(id == R.id.action_details) {
+			Intent intent = new Intent(DisplayActivity.this, DetailsActivity.class);
+			intent.putExtra("shopName", shopName);
+			startActivity(intent);
 		}
+		
+		
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -186,12 +209,42 @@ public class DisplayActivity extends ActionBarActivity {
 	/*##############################################################################################
 	 *  sets logo
 	 #############################################################################################*/
-	private void setLogo(String imageID , ImageView iv)	{
+	private void setLogo(String imageID , ImageButton ib)	{
 		try {
-
-			iv.setImageBitmap(imageLoadedFromInternalStorage(imageID));
+			ib.setImageBitmap(imageLoadedFromInternalStorage(imageID));
+			ib.setLayoutParams(new LinearLayout.LayoutParams(
+					(int) (width * 0.45), (int) (width * 0.45)));
+			ib.setScaleType(ScaleType.FIT_XY);
+			
+			ib.setOnClickListener(new View.OnClickListener() {
+				
+				String websiteAddress = getSharedPrefs(shopName, "website", "empty");
+				
+				public void onClick(View v) {
+					
+					if(!websiteAddress.equals("empty"))	{
+							
+						new AlertDialog.Builder(DisplayActivity.this)									
+					    .setMessage("Would you like to visit our Web page?")								
+					    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {								
+					        public void onClick(DialogInterface dialog, int which) { 								
+					        	Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(websiteAddress));		
+						        startActivity(browserIntent);	        								
+					        }								
+					     })								
+					    .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {								
+					        public void onClick(DialogInterface dialog, int which) { 								
+					            // do nothing								
+					        }								
+					     })								
+					    .setIcon(android.R.drawable.ic_dialog_alert)								
+					    .show();								
+					}	
+				}
+			});
 
 		} catch (Exception e) {
+			
 			Toast.makeText(getBaseContext(), "Catch #10:56", Toast.LENGTH_LONG).show();
 
 		}
@@ -234,18 +287,18 @@ public class DisplayActivity extends ActionBarActivity {
 		if(networkIsAvailable() && !(arrayOfImageIDsToDownload.length == 1 && arrayOfImageIDsToDownload[0].equals("")) && arrayOfImageIDsToDownload.length != 0 )	{
 
 			pDialog = new ProgressDialog (DisplayActivity.this);
-			pDialog.setMessage("Downloading "+arrayOfImageIDsToDownload.length+" Images...");
+			pDialog.setMessage("Downloading "+arrayOfImageIDsToDownload.length+" Image(s)...");
 			pDialog.show();	
 
 			imageCounter=0;
 			
-			String url = "http://wilcostr.pythonanywhere.com/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
+			String url = "http://www.loyal3.co.za/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
 
 			new DownloadAdvertImages().execute(url);
 
 		} else {
 
-			setLogo(getLogoID(shopName), logoView);
+			setLogo(getLogoID(shopName), logoButton);
 					
 			setAdvertFlipper();	//Mag dalk die 2 moet omruil.
 			setAdvertImages();
@@ -281,8 +334,7 @@ public class DisplayActivity extends ActionBarActivity {
 
 
 		} else {
-
-			Toast.makeText(getBaseContext(), "getImageIDs: 'empty'", Toast.LENGTH_LONG).show();
+			
 			return empty;
 		}
 	}		
@@ -341,17 +393,16 @@ public class DisplayActivity extends ActionBarActivity {
 
 				if(imageCounter < arrayOfImageIDsToDownload.length)	{
 
-					String url = "http://wilcostr.pythonanywhere.com/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
+					String url = "http://www.loyal3.co.za/downloadImage?image="+arrayOfImageIDsToDownload[imageCounter].trim()+"&res="+screenSize();
 
 					new DownloadAdvertImages().execute(url);
 
 				} else {
-					Toast.makeText(getBaseContext(), imageCounter+" images Downloaded at DISPLAY", Toast.LENGTH_LONG).show();
+					Toast.makeText(getBaseContext(), imageCounter+" image(s) downloaded.", Toast.LENGTH_LONG).show();
 
-					setLogo(getLogoID(shopName), logoView);
+					setLogo(getLogoID(shopName), logoButton);
 					ScanActivity.scanActivity.recreate();
 					setAdvertFlipper();
-					setAdvertImages();
 					pDialog.dismiss();
 				}
 
@@ -457,10 +508,12 @@ public class DisplayActivity extends ActionBarActivity {
 				
 			} catch (Exception e2)	{
 				
-				int idLogo = getResources().getIdentifier("ic_launcher", "drawable", "com.loyal3.loyal3");
-				Bitmap d = BitmapFactory.decodeResource(getResources(), idLogo);
-				Toast.makeText(getBaseContext(), "Image could not be loaded", Toast.LENGTH_LONG).show();
-				return d;
+				int lId = getResources().getIdentifier("shoplogo_no_image", "drawable", "com.loyal3.loyal3");
+				
+				Bitmap noImage = BitmapFactory.decodeResource(getResources(), lId);
+				
+				return noImage;
+				
 			}
 			
 		}
@@ -569,6 +622,7 @@ public class DisplayActivity extends ActionBarActivity {
 			/*	Image*/Button ib = (/*Image*/Button) findViewById(R.id.ibClaim);
 			ib.setVisibility(View.VISIBLE);
 			/*	ib.setPadding(0, 0, 0, 0);*/
+			ib.setLayoutParams(new LinearLayout.LayoutParams((int) (width*0.8),(int) (height*0.15)));
 
 			ib.setOnClickListener(new View.OnClickListener() {
 
@@ -577,22 +631,22 @@ public class DisplayActivity extends ActionBarActivity {
 					if(getSharedPrefs("userDetails", "allInfo", "").equals("true"))	{
 						
 					AlertDialog.Builder adb = new AlertDialog.Builder(DisplayActivity.this);
-					adb.setMessage("Once you click 'Yes, I am', you will have 5 minutes to claim your item from the cashier.\nAre you by the cashier?");
+					adb.setMessage("Once you click 'YES', you will have 5 minutes to claim your item from the cashier.\nAre you by the cashier?");
 					
-					adb.setPositiveButton("Yes, I am", new DialogInterface.OnClickListener() {
+					adb.setPositiveButton("YES", new DialogInterface.OnClickListener() {
 
 						public void onClick(DialogInterface dialog, int which) {
 
 							String uuid = getSharedPrefs("userDetails", "uuid", "");
 							
-							String url = "http://wilcostr.pythonanywhere.com/redeem?uuid="+uuid+"&shop="+shopName;
-						
-							new ValidateCounts().execute(url);
+							String url = "http://www.loyal3.co.za/redeem?uuid="+uuid+"&shop="+shopName;
+							
+							new ValidateCounts().execute(url.trim());
 						}
 					});	
 
 					//Neg Button does nothing.
-					adb.setNegativeButton("No, I am not", new DialogInterface.OnClickListener() {
+					adb.setNegativeButton("NO", new DialogInterface.OnClickListener() {
 						
 						public void onClick(DialogInterface dialog, int which) {
 							
@@ -616,7 +670,10 @@ public class DisplayActivity extends ActionBarActivity {
 		
 		int idFilled = getResources().getIdentifier(filled, "drawable", "com.loyal3.loyal3");
 		int idNotFilled = getResources().getIdentifier(notFilled, "drawable", "com.loyal3.loyal3");
-		int idFilledGold = getResources().getIdentifier(filledGold, "drawable", "com.loyal3.loyal3");
+	//	int idFilledGold = getResources().getIdentifier(filledGold, "drawable", "com.loyal3.loyal3");
+		
+		
+	if(Integer.parseInt(scanCount) < Integer.parseInt(maxScans)) {	
 		
 		//Top Row 
 		LinearLayout llStarsTopRow = (LinearLayout) findViewById(R.id.llStars1);
@@ -628,10 +685,10 @@ public class DisplayActivity extends ActionBarActivity {
 			ImageView iv = new ImageView(this);
 
 
-			if(Integer.parseInt(scanCount) == Integer.parseInt(maxScans))	{
+	/*		if(Integer.parseInt(scanCount) == Integer.parseInt(maxScans))	{
 				iv.setImageResource(idFilledGold);
 			}
-			else if( i < Integer.parseInt(scanCount))	{
+			else*/ if( i < Integer.parseInt(scanCount))	{
 				iv.setImageResource(idFilled);
 			}	
 			else	{
@@ -649,10 +706,10 @@ public class DisplayActivity extends ActionBarActivity {
 			ImageView iv = new ImageView(this);
 
 
-			if(Integer.parseInt(scanCount) == Integer.parseInt(maxScans))	{
+		/*	if(Integer.parseInt(scanCount) == Integer.parseInt(maxScans))	{
 				iv.setImageResource(idFilledGold);
 			}
-			else if( i < Integer.parseInt(scanCount))	{
+			else*/ if( i < Integer.parseInt(scanCount))	{
 				iv.setImageResource(idFilled);
 			}	
 			else	{
@@ -665,6 +722,7 @@ public class DisplayActivity extends ActionBarActivity {
 			llStarsBottomRow.addView(iv);
 
 		}
+	}
 
 		LinearLayout llMainDisplay = (LinearLayout) findViewById(R.id.llMainDisplay);
 
@@ -758,21 +816,38 @@ public class DisplayActivity extends ActionBarActivity {
 		protected void onPostExecute(String result) {	
 				
 			if(result.equals("*success*"))	{
+				
+				//Changed to localScanCount instead of scanCount
 				int lScanCountOld = Integer.parseInt(getSharedPrefs(shopName, "scanCount", "5"));
-				int lMaxScansOld = Integer.parseInt(getSharedPrefs(shopName, "maxScans", "5"));
-				String lScanCountNew = Integer.toString(lScanCountOld - lMaxScansOld);
+				int lMaxScansOld = Integer.parseInt(getSharedPrefs(shopName, "maxScans", "6"));
+				
+				int lScanCountNew = lScanCountOld - lMaxScansOld;
+				
+				if(lScanCountNew == 0) {
+					
+					lScanCountNew = Integer.parseInt(getSharedPrefs(shopName, "localScanCount", "0")) - lMaxScansOld;
+					
+				}
 				
 				Intent intent = new Intent(DisplayActivity.this, ClaimActivity.class);
 				intent.putExtra("shopName", shopName);
 				startActivity(intent);
 				
 				setSharedPrefs(shopName, "lastRedeem", currentTime());
-				setSharedPrefs(shopName, "scanCount", lScanCountNew);
+				setSharedPrefs(shopName, "scanCount", Integer.toString(lScanCountNew));
 				finish();
-
+				
+				
+			} else if(result.equals("*blocked*")) {
+					
+				Intent intentBlocked = new Intent(DisplayActivity.this, BlockedActivity.class);
+				startActivity(intentBlocked);
+				
 			} else {
 				try{	
-					Toast.makeText(getBaseContext(), "Error with mApp side scanCount. Real Scan count returned.", Toast.LENGTH_LONG).show();
+					Toast.makeText(getBaseContext(), "Returned: "+result, Toast.LENGTH_LONG).show();
+
+					Toast.makeText(getBaseContext(), "Error with scanCount. Scan count adjusted.", Toast.LENGTH_LONG).show();
 					
 					JSONObject json = new JSONObject(result);	
 	

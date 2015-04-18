@@ -23,7 +23,7 @@ public class MainActivity extends ActionBarActivity {
 		setContentView(R.layout.activity_main);
 		
 		String hasRegistered = getSharedPref("userDetails", "hasRegistered", "false");
-
+		
 		if(hasRegistered.equals("false"))	{
 			Intent intent = new Intent(this, RegisterActivity.class);
 			String uuid = UUID.randomUUID().toString();
